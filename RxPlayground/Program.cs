@@ -19,9 +19,14 @@ namespace RxPlayground
             var evts = hotTimer.GetObservable();
 
             //evts.Subscribe(ReceiveShort);
+            //TODO: tutaj jakas magia, ktora sprawi, ze publikowanie bedzie czekalo
+            //na zakonczenie ReceiveLong i zachowywalo kolejnosc
             evts.Subscribe(ReceiveLong, () => {
                 Printer.Print($"Completed, handled: {receiveLongHandled} events");
             });
+            //TODO: wspomniana wyzej magia nie powinna wplywac na to
+            //obecnie i tak to nie dziala poprawnie
+            evts.Subscribe(ReceiveShort);
 
             Console.WriteLine("Press any key...");
             Console.Read();
@@ -36,6 +41,7 @@ namespace RxPlayground
         private static int receiveLongHandled = 0;
         static void ReceiveLong(string evtDesc)
         {
+            //TODO: nie chcialbym locka - chcialbym miec to zalatwione przez rx i nie miec popsutej kolejnosci
             lock(receiveLongLock)
             {
                 Printer.Print($"Starting {evtDesc}");
